@@ -1,0 +1,55 @@
+{
+  "name": "oneson",
+  "version": "0.1.0",
+  "description": "game",
+  "main": "Source/Electron_Wrapper/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "build-game": "electron-builder -mwl"
+  },
+  "author": "AlphaZoo",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "15.0.0",
+    "electron-builder": "^22.11.7",
+    "electron-notarize": "^1.1.1",
+    "electron-settings": "^4.0.2"
+  },
+  "build": {
+    "appId": "com.electron.oneson",
+    "productName": "Oneson",
+    "copyright": "Copyright 2023 AlphaZoo LLC",
+    "afterSign": "Source/Electron_Wrapper/notarize.js",
+    "directories": {
+      "output": "../Release/Oneson/"
+    },
+    "dmg": {
+      "sign": false,
+      "contents": [
+        {
+          "x": 320,
+          "y": 240
+        }
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.educational-games",
+      "target": "dmg",
+      "icon": "Icons/oneson.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "Icons/oneson.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "executableName": "Oneson",
+      "category": "ArcadeGame"
+    }
+  }
+}
