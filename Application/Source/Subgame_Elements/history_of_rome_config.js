@@ -6,7 +6,7 @@
 //
 
 history_of_rome_config = {
-  "content_path": "../Content/History of Rome/",
+  "content_path": "./Content/HistoryOfRome/",
   "background_pool_path": "./Art/History of Rome Backgrounds/",
   "background_pool_size": 26,
   "background_width": 1456,

@@ -43,9 +43,19 @@ class ShowPlayer extends Screen {
       this.current_page = parseInt(this.current_page);
     }
 
-    this.current_episode = 0;
+    this.current_episode = localStorage.getItem("player_current_episode");
+    if (this.current_episode == null) {
+      this.current_episode = 0;
+    } else {
+      this.current_episode = parseInt(this.current_episode);
+    }
 
     this.historyOfRomeSpecificSetup();
+
+    this.selection_marker = makeSprite("./Art/Nav/marker.png", layers["episode_buttons"], 260, 554, 0.5, 0.5)
+    this.selection_marker.scale.set(0.8,0.8);
+    this.selection_marker.tint = 0x0A3463;
+    this.selection_marker.visible = false;
 
     this.updateEpisodes();
 
@@ -56,6 +66,7 @@ class ShowPlayer extends Screen {
     this.back_button.on("pointertap", () => {
       soundEffect("click");
       this.current_page -= 1;
+      this.current_episode = 0;
       if (this.current_page < 0) this.current_page = conf.pages.length - 1;
       localStorage.setItem("player_current_page", this.current_page);
       this.updateEpisodes();
@@ -68,6 +79,7 @@ class ShowPlayer extends Screen {
     this.forward_button.on("pointertap", () => {
       soundEffect("click");
       this.current_page += 1;
+      this.current_episode = 0;
       if (this.current_page >= conf.pages.length) this.current_page = 0;
       localStorage.setItem("player_current_page", this.current_page);
       this.updateEpisodes();
@@ -82,6 +94,8 @@ class ShowPlayer extends Screen {
 
   // This setup is specific to the History of Rome
   historyOfRomeSpecificSetup() {
+    let layers = this.layers;
+
     let title_font = {fontFamily: "Times New Roman", fontSize: 96, fontWeight: 900, fill: 0xFFFFFF, letterSpacing: 2, align: "left"};
     this.title = makeText("THE HISTORY OF ROME", title_font, layers["background"], 699, 80, 0.5, 0.5);
     this.title_2 = makeText("THE HISTORY OF ROME", title_font, layers["background"], 703, 82, 0.5, 0.5);
@@ -119,7 +133,8 @@ class ShowPlayer extends Screen {
     this.time_line = makeBlank(layers["player"], 891, 10, 260, 550);
     this.time_line.tint = 0x000000;
 
-    this.time_marker = makeSprite("./Art/Nav/time_marker.png", layers["player"], 260, 554, 0.5, 0.5)
+    this.time_marker = makeSprite("./Art/Nav/marker.png", layers["player"], 260, 554, 0.5, 0.5)
+    this.time_marker.tint = 0x000000;
 
     let time_font =  {fontFamily: "Bebas Neue", fontSize: 48, fontWeight: 900, fill: 0x000000, letterSpacing: 2, align: "right"};
     this.time_elapsed = makeText("00:00", time_font, layers["player"], 240, 535, 1, 0);
@@ -284,6 +299,7 @@ class ShowPlayer extends Screen {
 
   // Update the paginated list of episodes
   updateEpisodes() {
+    this.button_list = [];
     let layers = this.layers;
     let conf = this.config;
 
@@ -309,6 +325,16 @@ class ShowPlayer extends Screen {
         episode_text_box.tint = 0x000000;
       }
 
+      if (this.current_episode == i) {
+        if (raw_ep_text.startsWith("t_")) {
+          this.current_episode += 1;
+        } else {
+          this.selection_marker.position.set(backing.x - 26, backing.y + 38);
+          this.selection_marker.visible = true;
+        }
+      }
+
+      this.button_list.push(backing);
       if (!raw_ep_text.startsWith("t_")) {
         backing.on("pointertap", () => { 
           stopMusic()
@@ -319,7 +345,7 @@ class ShowPlayer extends Screen {
           this.episode_title.text = episode_text;
           this.state = "play";
           this.current_episode = i;
-        
+          localStorage.setItem("player_current_episode", this.current_episode);
 
           soundEffect("click");
           layers["episodes"].visible = false;
@@ -369,6 +395,7 @@ class ShowPlayer extends Screen {
         this.close_button.emit("pointertap");
         this.state = "selection";
         localStorage.setItem("player_current_page", this.current_page);
+        localStorage.setItem("player_current_episode", this.current_episode);
         return;
       }
     }
@@ -377,6 +404,7 @@ class ShowPlayer extends Screen {
     }
 
     localStorage.setItem("player_current_page", this.current_page);
+    localStorage.setItem("player_current_episode", this.current_episode);
 
     let raw_ep_text = conf.pages[this.current_page][this.current_episode];
     let music_path = conf.content_path + raw_ep_text;
@@ -404,6 +432,7 @@ class ShowPlayer extends Screen {
         this.state = "selection";
         this.close_button.emit("pointertap");
         localStorage.setItem("player_current_page", this.current_page);
+        localStorage.setItem("player_current_episode", this.current_episode);
         return;
       }
       this.current_episode = conf.pages[this.current_page].length - 1;
@@ -413,6 +442,7 @@ class ShowPlayer extends Screen {
     }
 
     localStorage.setItem("player_current_page", this.current_page);
+    localStorage.setItem("player_current_episode", this.current_episode);
 
     let raw_ep_text = conf.pages[this.current_page][this.current_episode];
     let music_path = conf.content_path + raw_ep_text;
@@ -443,12 +473,37 @@ class ShowPlayer extends Screen {
     console.log(key);
 
     if (this.state == "selection"){
-      if (key === "ArrowLeft" || key === "1") {
+      if (key === "ArrowLeft" || key === "4") {
         this.back_button.emit("pointertap");
       }
 
-      if (key === "ArrowRight" || key === "3") {
+      if (key === "ArrowRight" || key === "6") {
         this.forward_button.emit("pointertap");
+      }
+
+      if (key === "ArrowUp" || key === "1") {
+        this.current_episode -= 1;
+        if (this.current_episode < 0 || 
+          (this.current_episode == 0 && conf.pages[this.current_page][this.current_episode].startsWith("t_"))) {
+          this.current_episode = conf.pages[this.current_page].length - 1;
+        }
+        localStorage.setItem("player_current_episode", this.current_episode);
+        soundEffect("click");
+        this.updateEpisodes();
+      }
+
+      if (key === "ArrowDown" || key === "3") {
+        this.current_episode += 1;
+        if (this.current_episode >= conf.pages[this.current_page].length) {
+          this.current_episode = 0;
+        }
+        localStorage.setItem("player_current_episode", this.current_episode);
+        soundEffect("click");
+        this.updateEpisodes();
+      }
+
+      if (key === "Enter") {
+        this.button_list[this.current_episode].emit("pointertap");
       }
     }
 

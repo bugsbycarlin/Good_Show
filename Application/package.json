@@ -1,29 +1,34 @@
 {
-  "name": "oneson",
+  "name": "TheHistoryOfRome",
   "version": "0.1.0",
   "description": "game",
   "main": "Source/Electron_Wrapper/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "build-game": "electron-builder -mwl"
+    "build-game": "electron-builder -m"
   },
   "author": "AlphaZoo",
   "license": "MIT",
   "devDependencies": {
-    "electron": "15.0.0",
-    "electron-builder": "^22.11.7",
+    "electron": "^18.3.15",
+    "electron-builder": "^23.0.3",
     "electron-notarize": "^1.1.1",
-    "electron-settings": "^4.0.2"
+    "electron-settings": "^4.0.2",
+    "node-cmd": "^5.0.0",
+    "npm": "^8.8.0"
   },
   "build": {
-    "appId": "com.electron.oneson",
-    "productName": "Oneson",
-    "copyright": "Copyright 2023 AlphaZoo LLC",
+    "appId": "com.electron.the_history_of_rome",
+    "productName": "TheHistoryOfRome",
+    "copyright": "Copyright 2024 AlphaZoo LLC",
     "afterSign": "Source/Electron_Wrapper/notarize.js",
     "directories": {
-      "output": "../Release/Oneson/"
+      "output": "../Release/TheHistoryOfRome/"
     },
+    "extraFiles": [
+      "../Content/HistoryOfRome"
+    ],
     "dmg": {
       "sign": false,
       "contents": [
@@ -36,20 +41,15 @@
     "mac": {
       "category": "public.app-category.educational-games",
       "target": "dmg",
-      "icon": "Icons/oneson.icns",
+      "icon": "./Icons/history_of_rome.icns",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "entitlements.mac.plist",
       "entitlementsInherit": "entitlements.mac.plist"
-    },
-    "win": {
-      "target": "nsis",
-      "icon": "Icons/oneson.ico"
-    },
-    "linux": {
-      "target": "AppImage",
-      "executableName": "Oneson",
-      "category": "ArcadeGame"
     }
+  },
+  "dependencies": {
+    "builder-util": "^24.9.4",
+    "electron-settings": "^4.0.2"
   }
 }
