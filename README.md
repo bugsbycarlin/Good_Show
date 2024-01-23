@@ -1,2 +1,2 @@
-# Good_Show
+# Good Show
 Simple, elderly accessible player for podcasts.
